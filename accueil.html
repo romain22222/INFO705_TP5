@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Jardin Connecté</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('updateArrosage', function (value) {
+        document.getElementById('arrosage').value = value === "on" ? "Eteindre l'arrosage" : "Allumer l'arrosage";
+    })
+    function changeArrosage() {
+        socket.emit('arrosage');
+    }
+    socket.on('updateTemp', function (value) {
+        document.getElementById('temperature').innerHTML = `Température de la serre = ${Number((value).toFixed(1))} C°`;
+    })
+    socket.on('updateHumid', function (value) {
+        document.getElementById('humidite').innerHTML = `Humidité de la serre = ${Number((value).toFixed(2))} %`;
+    })
+</script>
+<body>
+    <h1>Mon Jardin Connecté</h1>
+    <div id="temperature"></div>
+    <div id="humidite">
+        Humidité de la serre = 15.2 %
+    </div>
+    <input id="arrosage" type="button" onclick="changeArrosage()" value="Allumer l'arrosage">
+</body>
+</html>
