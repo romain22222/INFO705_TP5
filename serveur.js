@@ -2,12 +2,14 @@ import fetch from "node-fetch";
 
 import express from "express";
 
-import http from "http";
+import {createServer} from "http";
 
-import mqtt from "mqtt";
+import {connect} from "mqtt";
 import {Server} from "socket.io";
 
-import jrpc from "json-rpc-2.0"
+import jrpc from "json-rpc-2.0";
+import {dirname} from "path";
+import {fileURLToPath} from "url";
 
 async function manageArrosage(socket, clientRPC, currentState, io) {
     socket.on('arrosage', function () {
@@ -20,7 +22,7 @@ async function manageArrosage(socket, clientRPC, currentState, io) {
 }
 
 async function manageCapteurs(io) {
-    const client = mqtt.connect('http://localhost:1883')  // create a client
+    const client = connect('http://localhost:1883')  // create a client
     client.on('connect', function () {
         console.log("Connected");
         client.subscribe('/capteur/+', () => {
@@ -44,7 +46,7 @@ export function main() {
     const app = express();
     const JSONRPCClient = jrpc.JSONRPCClient;
 
-    const server = http.createServer(app);
+    const server = createServer(app);
     const io = new Server(server);
     const clientRPC = new JSONRPCClient((jsonRPCRequest) =>
         fetch("http://localhost:8000/json-rpc", {
@@ -67,7 +69,7 @@ export function main() {
     let currentState = "on"
 
     app.get('/', function (req, res) {
-        res.sendFile(__dirname + '/accueil.html');
+        res.sendFile(dirname(fileURLToPath(import.meta.url)) + '/accueil.html');
     });
 
     io.on('connection', (socket) => {
