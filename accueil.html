@@ -2,31 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mon Jardin Connecté</title>
+    <title>Mon Compte</title>
 </head>
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
 
-    socket.on('updateArrosage', function (value) {
-        document.getElementById('arrosage').value = value === "on" ? "Eteindre l'arrosage" : "Allumer l'arrosage";
+    socket.on('updateAcc', function (value) {
+        document.getElementById("idAcc").innerHTML = `Id du compte : ${value.split(" -- ")[0]}`;
+        document.getElementById('account').innerText = value.split(" -- ")[1] + " €";
     })
-    function changeArrosage() {
-        socket.emit('arrosage');
+
+    function add() {
+        socket.emit('ajout', document.getElementById("amount").value);
     }
-    socket.on('updateTemp', function (value) {
-        document.getElementById('temperature').innerHTML = `Température de la serre = ${Number((value).toFixed(1))} C°`;
-    })
-    socket.on('updateHumid', function (value) {
-        document.getElementById('humidite').innerHTML = `Humidité de la serre = ${Number((value).toFixed(2))} %`;
-    })
+
+    function suppr() {
+        socket.emit('suppr', document.getElementById("amount").value);
+    }
+
+    function get() {
+        socket.emit('get', document.getElementById("idAcc").innerHTML);
+    }
 </script>
 <body>
-    <h1>Mon Jardin Connecté</h1>
-    <div id="temperature"></div>
-    <div id="humidite">
-        Humidité de la serre = 15.2 %
-    </div>
-    <input id="arrosage" type="button" onclick="changeArrosage()" value="Allumer l'arrosage">
+<h1>Mon compte</h1>
+<p id="idAcc"></p>
+
+<label for="account">Montant du compte :</label>
+<div id="account"></div>
+<br/>
+
+<h2>Actions sur le compte</h2>
+<br/>
+<input id="amount" type="number" value="0">
+<input id="add" onclick="add()" type="button" value="Ajouter">
+<input id="del" onclick="suppr()" type="button" value="Retirer">
+<input id="get" onclick="get()" type="button" value="Actualiser">
 </body>
 </html>
